@@ -1,0 +1,218 @@
+from google.colab import files
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+2. Upload the Dataset
+uploaded = files.upload()
+
+Figure 1: Successful Upload of the Dataset
+3. Load the Dataset
+df = pd.read_csv("credit_record.csv")
+4. Display first 5 enteries
+print("\nFirst 5 Rows:")
+print(df.head())
+print("\nDataset Shape:")
+print(df.shape)
+
+print("\nColumn Names:")
+print(df.columns.tolist())
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+Figure 2: Displaying information of Dataset
+
+5. Separate Independent and Dependent Variables
+X = df[[
+    "ID",
+    "MONTHS_BALANCE"
+]]
+y = df["STATUS"]
+print("\nFeatures:")
+print(X.columns.tolist())
+print("\nTarget: STATUS")
+print("Target contains credit account status values:")
+print(y.unique())
+
+Figure 3: Displaying Independent and Dependent Variables of the Dataset
+6. Split Dataset into Training and Testing Data
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42,
+    stratify=y
+)
+print("Training Data:", X_train.shape)
+
+print("Testing Data :", X_test.shape)
+
+print("\nTraining Target Distribution:")
+print(y_train.value_counts())
+
+print("\nTesting Target Distribution:")
+print(y_test.value_counts())
+
+Figure 4: Distribution of training and testing data
+7. Scale the Data
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test
+8.Logistic Regression Model
+logistic_model = LogisticRegression(max_iter=1000)
+# Train the model
+logistic_model.fit(X_train_scaled, y_train)
+# Predictions
+logistic_pred = logistic_model.predict(X_test_scaled)
+logistic_accuracy = accuracy_score(
+ y_test,
+logistic_pred
+)
+logistic_recall = recall_score(
+    y_test,
+    logistic_pred,
+    average="weighted",
+    zero_division=0
+)
+logistic_f1 = f1_score(
+    y_test,
+    logistic_pred,
+    average="weighted",
+    zero_division=0
+)
+print("Accuracy :", logistic_accuracy)
+print("Recall   :", logistic_recall)
+print("F1 Score :", logistic_f1)
+
+Figure 5: Logistic Regression Model Performance Evaluation	
+11. KNN Model
+knn_model = KNeighborsClassifier(
+    n_neighbors=3
+)
+# Train the model
+knn_model.fit(
+    X_train_scaled,
+    y_train
+)
+# Predictions
+knn_pred = knn_model.predict(
+    X_test_scaled
+)
+knn_accuracy = accuracy_score(
+    y_test,
+    knn_pred
+)
+knn_recall = recall_score(
+    y_test,
+    knn_pred,
+    average="weighted",
+    zero_division=0
+)
+knn_f1 = f1_score(
+    y_test,
+    knn_pred,
+    average="weighted",
+    zero_division=0
+)
+print("Accuracy :", knn_accuracy)
+print("Recall   :", knn_recall)
+print("F1 Score :", knn_f1)
+
+	 
+Figure 6: K-Nearest Neighbors (KNN) Model Performance Evaluation
+14.  Compare Both Models
+comparison = pd.DataFrame({
+    "Model": [
+        "Logistic Regression",
+        "KNN"
+    ],
+    "Accuracy": [
+        round(logistic_accuracy * 100, 2),
+        round(knn_accuracy * 100, 2)
+    ],
+    "Recall": [
+        round(logistic_recall * 100, 2),
+        round(knn_recall * 100, 2)
+    ],
+    "F1 Score": [
+        round(logistic_f1 * 100, 2),
+        round(knn_f1 * 100, 2)
+    ]
+})
+print(comparison.to_string(index=False))
+
+
+
+15.  Accuracy Comparison Graph
+import matplotlib.pyplot as plt
+import numpy as np
+models = ["Logistic Regression", "KNN"]
+accuracy = [
+    logistic_accuracy * 100,
+    knn_accuracy * 100
+]
+recall = [
+    logistic_recall * 100,
+    knn_recall * 100
+]
+f1_score_values = [
+    logistic_f1 * 100,
+    knn_f1 * 100
+]
+x = np.arange(len(models))
+width = 0.25
+plt.figure(figsize=(10, 6))
+# Accuracy Bars
+plt.bar(
+    x - width,
+    accuracy,
+    width,
+    label="Accuracy"
+)
+# Recall Bars
+plt.bar(
+    x,
+    recall,
+    width,
+    label="Recall"
+)
+# F1 Score Bars
+plt.bar(
+    x + width,
+    f1_score_values,
+    width,
+    label="F1 Score"
+)
+plt.xlabel("Machine Learning Models")
+plt.ylabel("Score (%)")
+plt.title("Logistic Regression vs KNN Comparison")
+plt.xticks(x, models)
+plt.ylim(0, 110)
+plt.legend()
+# Display values on bars
+for i in range(len(models)):
+    plt.text(
+        x[i] - width,
+        accuracy[i] + 2,
+        f"{accuracy[i]:.2f}%",
+        ha="center"
+    )
+    plt.text(
+        x[i],
+        recall[i] + 2,
+        f"{recall[i]:.2f}%",
+        ha="center"
+    )
+    plt.text(
+        x[i] + width,
+        f1_score_values[i] + 2,
+        f"{f1_score_values[i]:.2f}%",
+        ha="center"
+    )
+plt.tight_layout()
+plt.show()
