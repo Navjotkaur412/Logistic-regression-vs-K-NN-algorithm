@@ -1,0 +1,101 @@
+from google.colab import files
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import (
+    confusion_matrix, ConfusionMatrixDisplay,
+    accuracy_score, precision_score, recall_score, f1_score,
+    classification_report
+)
+uploaded=files.upload()
+df = pd.read_csv("bank.csv")
+
+print("\nFirst 5 Rows:")
+df.head()
+print("\nDataset Shape:")
+print(df.shape)
+X = df_encoded.drop(columns=["deposit"])
+y = df_encoded["deposit"]
+
+print("\nFeatures:")
+print(X.columns.tolist())
+
+print("\nTarget: deposit")
+print(y.unique())
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.40,
+    random_state=45,
+    stratify=y
+)
+
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+knn_model = KNeighborsClassifier(
+    n_neighbors=4
+)
+knn_model.fit(
+    X_train_scaled,
+    y_train
+)
+knn_pred = knn_model.predict(
+    X_test_scaled
+)
+
+knn_accuracy = accuracy_score(
+    y_test,
+    knn_pred
+)
+
+knn_precision = precision_score(
+    y_test,
+    knn_pred,
+    average="weighted",
+    zero_division=0
+)
+
+knn_recall = recall_score(
+    y_test,
+    knn_pred,
+    average="weighted",
+    zero_division=0
+)
+
+knn_f1 = f1_score(
+    y_test,
+    knn_pred,
+    average="weighted",
+    zero_division=0
+)
+
+print("Accuracy  :", knn_accuracy)
+print("Precision :", knn_precision)
+print("Recall    :", knn_recall)
+print("F1 Score  :", knn_f1)
+knn_cm = confusion_matrix(
+    y_test,
+    knn_pred
+)
+
+disp_knn = ConfusionMatrixDisplay(
+    confusion_matrix=knn_cm,
+    display_labels=le_target.classes_
+)
+
+disp_knn.plot(cmap="Greens")
+plt.title("Confusion Matrix - KNN")
+plt.show()
+
+
+
+
